@@ -263,6 +263,33 @@ int main (int argc, char **argv)
 			     MAXLINE + 1,
 			     "226 Transfer complete\r\n");
 		    write(connfd, respline, strlen(respline));
+		    fclose (fpin);
+		  }
+		  else if(!strcmp(cmd_file_arg, "retr")){
+		    cmd_file_arg = strtok(NULL, "");
+		    if(pFile = fopen (cmd_file_arg, "r")){;
+		      fpout = fdopen(conndatafd, "w");
+		      snprintf(respline,
+			       MAXLINE + 1,
+			       "150 Opening BINARY mode data connection for %s\r\n",
+			       arg1);
+		      write(connfd, respline, strlen(respline));
+		      while (fgets(dataline, MAXLINE, pFile) != NULL)
+			fputs (dataline, fpout);
+		      fclose (pFile);
+		      fclose (fpout);
+		      snprintf(respline,
+			       MAXLINE + 1,
+			       "226 Transfer complete\r\n");
+		      write(connfd, respline, strlen(respline));
+		    }
+		    else {
+		      snprintf(respline,
+			       MAXLINE + 1,
+			       "550 %s: Arquivo ou diretorio nao encontrado\r\n",
+			       cmd_file_arg);
+		      write(connfd, respline, strlen(respline));
+		    }
 		  }
 		  else if(!strcmp(cmd_file_arg, "write")){
 		    cmd_file_arg = strtok(NULL, "");
@@ -312,7 +339,8 @@ int main (int argc, char **argv)
 	  }
 	  else if (!strcmp (cmd, "retr")){
 	    strcpy (arg1, strtok (NULL, "\r\n"));
-	    snprintf (cmd_file, MAXLINE, "a");
+	    snprintf (cmd_file, MAXLINE, "retr %s", arg1);
+	    write(fd[1], cmd_file, strlen(cmd_file));
 	  }
 	  else
 	    strcpy(respline, "500 Invalid command");

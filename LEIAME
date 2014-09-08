@@ -1,0 +1,20 @@
+EP1-Servido FTP
+
+Introdução
+
+Esse servidor foi implementado com o intuito de se comportar como o servidor proftpd, no modo passivo, em algumas situações como na transferência de arquivo. Por esse motivo não foi implementado todas as funcionalidades de um servidor mínimo. Mas ainda sim é possível baixar e enviar arquivos com um cliente ftp.
+
+Visão geral
+
+O servidor é inicializado e fica escutando sobre uma porta especificada.
+Assim que um cliente se conecta, um novo processo é inicializado para gerenciar os comandos enviados pelo cliente.
+Para o processo de transferência de dados, um novo processo começa sobre uma outra porta e sobre essa porta os arquivos são trocados.
+
+Alguns detalhes de implementação
+
+O servidor foi implementado utilizando como suporte o código fornecido pelo professor no paca.
+Para as conexões, a função socket fornecido pelo sistema operacional Linux foi utilizado e seus argumentos são os protocolos de rede e de transporte, IPv4 e TCP respectivamente.
+O socket é configurado e é atribuído uma porta para a futura conexão, porta que é passada na chamada do programa como argumento.
+Para a criação de processos independentes foi utilizado a função fork, ao todo foi usado duas vezes, uma para separar o processo de gestão de novos clientes e processo de escuta de comandos do usuário (PI), e outra vez para separa o PI do processo de transferência de dados (DTP).
+O parser usado para obter os comandos, seja do client para o PI, quanto do PI para DTP, foi feito usando if-else encadeados e as funções strcmp e strtok.
+A troca de mensagens foi feita se utilizando das funções write e read, e para o envio de arquivos, as funçoes fdopen, fputs e fgets.
